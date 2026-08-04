@@ -5,7 +5,7 @@ const Header = () => {
   const [isActiveSearch, setIsActiveSearch] = useState(false);
 
   return (
-    <header className="max-h-11/12 h-20 my-10 flex justify-between items-center">
+    <header className="max-h-11/12 h-20 my-10 flex justify-between items-center mx-5">
       {!isActiveSearch && (
         <h2 className="text-2xl font-bold whitespace-nowrap">
           Мир упаковки

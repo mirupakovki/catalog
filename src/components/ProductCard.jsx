@@ -1,61 +1,88 @@
-import React, { useState } from 'react';
-import img from '../assets/img.jpg';
 import { BiBasket } from 'react-icons/bi';
 import { IoAdd, IoRemove } from 'react-icons/io5';
 
-const ProductCard = () => {
-  const [count, setCount] = useState(0);
+const placeholder =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect fill='%23e0e0e0' width='300' height='300'/%3E%3Ctext fill='%23888' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-family='Arial' font-size='18'%3EНет фото%3C/text%3E%3C/svg%3E";
 
-  const handleClick = () => {
-    setCount(1);
-  };
-
-  const handleAdd = () => {
-    setCount((prev) => prev + 1);
-  };
-
-  const handleRemove = () => {
-    setCount((prev) => prev - 1);
-  };
+const ProductCard = ({
+  image,
+  name = 'Без названия',
+  description = '',
+  price = 0,
+  packQuantity = '',
+  category = '',
+  count = 0,
+  onCountChange,
+}) => {
+  const handleAdd = () => onCountChange(count + 1);
+  const handleRemove = () => onCountChange(Math.max(0, count - 1));
+  const handleAddToCart = () => onCountChange(1);
 
   return (
-    <div className="flex shadow-md  rounded-2xl">
-      <div className="w-1/3 p-1 flex justify-center items-center rounded-2xl">
-        <img className="rounded-2xl object-contain" src={img} alt="" />
-      </div>
-      <div className="p-2">
-        <div className="flex justify-between items-start">
-          <div className='w-3/5 '>
-            <h2 className="text-sm font-medium">Вояж Желтый 120л</h2>
-            <p className='text-xs text-gray-500'>Lorem ipsum dolor sit amet consectetur.</p>
-          </div>
-          <span className="px-2 py-1 bg-blue-50 text-blue-800 font-semibold rounded-2xl text-[10px]">
-            Мус. пакеты
+    <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col">
+      {/* Фото */}
+      <div className="w-full h-48 bg-gray-100 relative">
+        <img
+          src={image || placeholder}
+          alt={name}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            if (!e.target.src.includes('data:image')) {
+              e.target.src = placeholder;
+            }
+          }}
+        />
+        {category && (
+          <span className="absolute top-3 left-3 px-2 py-1 bg-white/90 backdrop-blur-sm text-blue-800 font-semibold rounded-full text-[10px] shadow-sm">
+            {category}
           </span>
-        </div>
-        <div className='flex justify-between items-center'>
-            <h2 className='text-blue-800 font-semibold'>30₽ за шт</h2>
+        )}
+        {packQuantity && (
+          <span className="absolute top-3 right-3 px-2 py-1 bg-black/60 backdrop-blur-sm text-white font-medium rounded-full text-[10px] shadow-sm">
+            📦 {packQuantity} шт/уп
+          </span>
+        )}
+      </div>
+
+      {/* Инфо */}
+      <div className="p-4 flex flex-col flex-1">
+        <h3 className="font-semibold text-gray-800 text-sm leading-tight line-clamp-2">
+          {name}
+        </h3>
+        {description && (
+          <p className="text-xs text-gray-400 mt-1 line-clamp-2">{description}</p>
+        )}
+
+        {/* Цена и кнопка */}
+        <div className="mt-auto pt-3 flex items-center justify-between">
+          <span className="text-blue-800 font-bold text-lg">
+            {price.toFixed(2)} ₽
+            <span className="text-gray-400 text-xs font-normal"> /шт</span>
+          </span>
+
           {count === 0 ? (
             <button
-              className="p-2 flex items-center justify-between border border-blue-800 rounded-full"
-              onClick={handleClick}
+              onClick={handleAddToCart}
+              className="flex items-center gap-1.5 bg-blue-800 hover:bg-blue-900 text-white px-3 py-2 rounded-full text-sm font-medium transition-colors duration-200"
             >
-              <BiBasket className="size-5 text-blue-800" />
+              <BiBasket className="size-4" />
             </button>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 bg-blue-50 rounded-full px-2 py-1">
               <button
-                className="p-2 border border-blue-800 rounded-full flex items-center justify-between"
                 onClick={handleRemove}
+                className="w-7 h-7 flex items-center justify-center bg-white rounded-full border border-blue-200 hover:bg-blue-100 transition-colors"
               >
-                <IoRemove className="size-5 text-blue-800" />
+                <IoRemove className="size-3 text-blue-800" />
               </button>
-              {count}
+              <span className="text-blue-800 font-bold text-sm w-5 text-center">
+                {count}
+              </span>
               <button
-                className="p-2 border border-blue-800 rounded-full flex items-center justify-between"
                 onClick={handleAdd}
+                className="w-7 h-7 flex items-center justify-center bg-white rounded-full border border-blue-200 hover:bg-blue-100 transition-colors"
               >
-                <IoAdd className="size-5 text-blue-800" />
+                <IoAdd className="size-3 text-blue-800" />
               </button>
             </div>
           )}
