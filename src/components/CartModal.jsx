@@ -25,7 +25,7 @@ const CartModal = ({
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromo, setAppliedPromo] = useState(null);
 
-  const WHATSAPP_NUMBER = '79099999999';
+  const WHATSAPP_NUMBER = '79289466888';
 
   // Промокоды
   const PROMO_CODES = {
