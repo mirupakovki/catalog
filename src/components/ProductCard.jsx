@@ -10,7 +10,6 @@ const ProductCard = ({
   description = '',
   price = 0,
   packQuantity = '',
-  category = '',
   count = 0,
   onCountChange,
 }) => {
@@ -32,11 +31,6 @@ const ProductCard = ({
             }
           }}
         />
-        {category && (
-          <span className="absolute top-3 left-3 px-2 py-1 bg-white/90 backdrop-blur-sm text-blue-800 font-semibold rounded-full text-[10px] shadow-sm">
-            {category}
-          </span>
-        )}
         {packQuantity && (
           <span className="absolute top-3 right-3 px-2 py-1 bg-black/60 backdrop-blur-sm text-white font-medium rounded-full text-[10px] shadow-sm">
             📦 {packQuantity} шт/уп
@@ -54,7 +48,8 @@ const ProductCard = ({
         )}
 
         {/* Цена и кнопка */}
-        <div className="mt-auto pt-3 flex items-center justify-between">
+                {/* Цена и кнопка */}
+        <div className="mt-auto pt-3 flex flex-col gap-2">
           <span className="text-blue-800 font-bold text-lg">
             {price.toFixed(2)} ₽
             <span className="text-gray-400 text-xs font-normal"> /шт</span>
@@ -63,26 +58,27 @@ const ProductCard = ({
           {count === 0 ? (
             <button
               onClick={handleAddToCart}
-              className="flex items-center gap-1.5 bg-blue-800 hover:bg-blue-900 text-white px-3 py-2 rounded-full text-sm font-medium transition-colors duration-200"
+              className="flex items-center justify-center gap-1.5 bg-blue-800 hover:bg-blue-900 text-white px-3 py-2 rounded-full text-sm font-medium transition-colors duration-200 w-full"
             >
               <BiBasket className="size-4" />
+              В корзину
             </button>
           ) : (
-            <div className="flex items-center gap-2 bg-blue-50 rounded-full px-2 py-1">
+            <div className="flex items-center justify-between bg-blue-50 rounded-full px-1 py-1 w-full">
               <button
                 onClick={handleRemove}
                 className="w-7 h-7 flex items-center justify-center bg-white rounded-full border border-blue-200 hover:bg-blue-100 transition-colors"
               >
-                <IoRemove className="size-3 text-blue-800" />
+                <IoRemove className="size-4 text-blue-800" />
               </button>
-              <span className="text-blue-800 font-bold text-sm w-5 text-center">
+              <span className="text-blue-800 font-bold text-base">
                 {count}
               </span>
               <button
                 onClick={handleAdd}
                 className="w-7 h-7 flex items-center justify-center bg-white rounded-full border border-blue-200 hover:bg-blue-100 transition-colors"
               >
-                <IoAdd className="size-3 text-blue-800" />
+                <IoAdd className="size-4 text-blue-800" />
               </button>
             </div>
           )}

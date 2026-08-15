@@ -69,36 +69,62 @@ const ProductList = () => {
     return sum + qty * parseFloat(p.price || 0);
   }, 0);
 
-  return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
-      {/* Шапка с корзиной */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">🛒 Каталог товаров</h1>
-        {totalItems > 0 && (
-          <div className="bg-blue-800 text-white px-4 py-2 rounded-full text-sm font-medium">
-            🛒 {totalItems} шт. — {totalPrice.toFixed(2)} ₽
-          </div>
-        )}
-      </div>
+  const [activeCategory, setActiveCategory] = useState('Все');
 
-      {/* Сетка товаров */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {products.map((product, i) => (
-          <ProductCard
-            key={i}
-            image={product.image || placeholder}
-            name={product.name || 'Без названия'}
-            description={product.description || ''}
-            price={parseFloat(product.price) || 0}
-            packQuantity={product.packQuantity || ''}
-            category={product.category || ''}
-            count={cart[product.name] || 0}
-            onCountChange={(count) => updateCart(product.name, count)}
-          />
-        ))}
-      </div>
+// Получаем список категорий
+const categories = ['Все', ...new Set(products.map(p => p.category || 'Без категории'))];
+
+const filteredProducts = activeCategory === 'Все'
+  ? products
+  : products.filter(p => (p.category || 'Без категории') === activeCategory);
+
+return (
+  <div className="max-w-6xl mx-auto px-4 py-6">
+    {/* Шапка с корзиной */}
+    <div className="flex justify-between items-center mb-6">
+      <h1 className="text-2xl font-bold text-gray-800">🛒 Каталог товаров</h1>
+      {totalItems > 0 && (
+        <div className="bg-blue-800 text-white px-4 py-2 rounded-full text-sm font-medium">
+          🛒 {totalItems} шт. — {totalPrice.toFixed(2)} ₽
+        </div>
+      )}
     </div>
-  );
+
+    {/* Кнопки категорий */}
+    <div className="flex flex-wrap gap-2 mb-6">
+      {categories.map(cat => (
+        <button
+          key={cat}
+          onClick={() => setActiveCategory(cat)}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            activeCategory === cat
+              ? 'bg-blue-800 text-white'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
+        >
+          {cat}
+        </button>
+      ))}
+    </div>
+
+    {/* Сетка товаров */}
+    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {filteredProducts.map((product, i) => (
+        <ProductCard
+          key={i}
+          image={product.image || placeholder}
+          name={product.name || 'Без названия'}
+          description={product.description || ''}
+          price={parseFloat(product.price) || 0}
+          packQuantity={product.packQuantity || ''}
+          category={product.category || ''}
+          count={cart[product.name] || 0}
+          onCountChange={(count) => updateCart(product.name, count)}
+        />
+      ))}
+    </div>
+  </div>
+);
 };
 
 export default ProductList;
