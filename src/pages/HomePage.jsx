@@ -1,13 +1,22 @@
+import { useState } from 'react';
 import Header from '../components/Header';
 import Main from '../components/Main';
 
 const HomePage = () => {
-    return (
-        <div className='min-h-screen '>
-            <Header />
-            <Main />
-        </div>
-    );
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isActiveSearch, setIsActiveSearch] = useState(false);
+
+  return (
+    <div className='min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 pt-5'>
+      <Header
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        isActiveSearch={isActiveSearch}
+        setIsActiveSearch={setIsActiveSearch}
+      />
+      <Main searchQuery={searchQuery} />
+    </div>
+  );
 };
 
 export default HomePage;

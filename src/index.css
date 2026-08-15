@@ -3,3 +3,9 @@
 #root {
     background-color: oklch(96.7% 0.003 264.542);
 }
+
+.dark #root {
+    background-color: #111827; /* тёмный фон */
+}
+
+@custom-variant dark (&:where(.dark, .dark *));

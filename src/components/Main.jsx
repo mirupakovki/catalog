@@ -1,12 +1,11 @@
-import React from 'react';
 import ProductList from './ProductList';
 
-const Main = () => {
-    return (
-        <div className='mx-auto p-1 max-w-11/12 min-h-10/12 bg-white rounded-2xl'>
-            <ProductList/>
-        </div>
-    );
+const Main = ({ searchQuery }) => {
+  return (
+    <main>
+      <ProductList searchQuery={searchQuery} />
+    </main>
+  );
 };
 
 export default Main;

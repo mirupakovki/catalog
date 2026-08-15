@@ -1,18 +1,22 @@
 import { IoSearch, IoClose } from 'react-icons/io5';
 
-const Search = ({ isActiveSearch, setIsActiveSearch }) => {
+const Search = ({ searchQuery, setSearchQuery, isActiveSearch, setIsActiveSearch }) => {
   const handleClickIsActiveSearch = () => {
+    if (isActiveSearch) {
+      setSearchQuery('');
+    }
     setIsActiveSearch(!isActiveSearch);
   };
 
   return (
     <div className="w-full flex items-center justify-between gap-2">
-      {/* Инпут поиска */}
       <input
         className={`
           h-12 px-4
-          outline-0 border-2 border-black rounded-xl
+          outline-0 border-2 border-black dark:border-gray-600 rounded-xl
           text-base
+          bg-white dark:bg-gray-800
+          text-gray-700 dark:text-white
           transition-all duration-300
           ${isActiveSearch 
             ? 'min-w-9/12 opacity-100 visible' 
@@ -21,14 +25,15 @@ const Search = ({ isActiveSearch, setIsActiveSearch }) => {
         `}
         type="text"
         placeholder={isActiveSearch ? 'Поиск...' : ''}
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
       />
       
-      {/* Кнопка поиска/закрытия */}
       <div
         className="
           w-12 h-12
           flex-shrink-0 flex justify-center items-center 
-          bg-black rounded-xl
+          bg-black dark:bg-gray-700 rounded-xl
           cursor-pointer transition-transform hover:scale-110
         "
         onClick={handleClickIsActiveSearch}

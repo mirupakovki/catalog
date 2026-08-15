@@ -1,12 +1,14 @@
-import React from 'react';
-import HomePage from './pages/HomePage';
+import { ThemeProvider } from './components/ThemeContext';
+import { FavoritesProvider } from './components/FavoritesContext';
+import HomePage from './pages/HomePage'; 
 
-const App = () => {
+function App() {
   return (
-    <div className='w-full flex justify-center'>
-      <HomePage/>
-    </div>
+    <ThemeProvider>
+      <FavoritesProvider>
+        <HomePage />
+      </FavoritesProvider>
+    </ThemeProvider>
   );
-};
-
+}
 export default App;
