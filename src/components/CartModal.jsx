@@ -194,7 +194,7 @@ ${cartItems.map((item, i) => (
                           <IoAdd className="size-3 text-gray-600 dark:text-white" />
                         </button>
                       </div>
-                      <div className="text-sm font-bold text-blue-800 dark:text-blue-400 w-20 text-right">
+                      <div className="text-sm font-bold text-blue-600 dark:text-blue-400 w-20 text-right">
                         {item.total.toFixed(2)} ₽
                       </div>
                     </div>
@@ -218,12 +218,12 @@ ${cartItems.map((item, i) => (
                         value={promoCode}
                         onChange={(e) => setPromoCode(e.target.value)}
                         placeholder="Введите промокод"
-                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800 text-sm"
+                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
                       />
                       <button
                         type="button"
                         onClick={applyPromo}
-                        className="px-4 py-2 bg-blue-800 hover:bg-blue-900 text-white rounded-lg text-sm font-medium"
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-900 text-white rounded-lg text-sm font-medium"
                       >
                         Применить
                       </button>
@@ -256,12 +256,12 @@ ${cartItems.map((item, i) => (
                       <span className="text-sm text-gray-400 line-through mr-2">
                         {totalPrice.toFixed(2)} ₽
                       </span>
-                      <span className="text-2xl font-bold text-blue-800 dark:text-blue-400">
+                      <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                         {finalPrice.toFixed(2)} ₽
                       </span>
                     </div>
                   ) : (
-                    <span className="text-2xl font-bold text-blue-800 dark:text-blue-400">
+                    <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                       {totalPrice.toFixed(2)} ₽
                     </span>
                   )}
@@ -269,7 +269,7 @@ ${cartItems.map((item, i) => (
 
                 <button
                   onClick={() => setIsCheckout(true)}
-                  className="w-full bg-blue-800 hover:bg-blue-900 dark:bg-blue-700 dark:hover:bg-blue-800 text-white py-3 rounded-xl font-medium transition-colors"
+                  className="w-full bg-blue-600 hover:bg-blue-900 dark:bg-blue-700 dark:hover:bg-blue-600 text-white py-3 rounded-xl font-medium transition-colors"
                 >
                   Оформить заказ
                 </button>
@@ -302,7 +302,7 @@ ${cartItems.map((item, i) => (
                 required
                 value={formData.name}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-800 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-700 dark:text-white"
+                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-700 dark:text-white"
                 placeholder="Иван"
               />
             </div>
@@ -316,7 +316,7 @@ ${cartItems.map((item, i) => (
                 required
                 value={formData.phone}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-800 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-700 dark:text-white"
+                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-700 dark:text-white"
                 placeholder="+7 (900) 000-00-00"
               />
             </div>
@@ -329,7 +329,7 @@ ${cartItems.map((item, i) => (
                 name="address"
                 value={formData.address}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-800 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-700 dark:text-white"
+                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-700 dark:text-white"
                 placeholder="Город, улица, дом"
               />
             </div>
@@ -342,7 +342,7 @@ ${cartItems.map((item, i) => (
                 value={formData.comment}
                 onChange={handleInputChange}
                 rows="3"
-                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-800 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-700 dark:text-white resize-none"
+                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-700 dark:text-white resize-none"
                 placeholder="Дополнительная информация"
               />
             </div>
@@ -359,7 +359,7 @@ ${cartItems.map((item, i) => (
                   <span>-{discountAmount.toFixed(2)} ₽</span>
                 </div>
               )}
-              <div className="flex justify-between text-lg font-bold text-blue-800 dark:text-blue-400">
+              <div className="flex justify-between text-lg font-bold text-blue-600 dark:text-blue-400">
                 <span>Итого:</span>
                 <span>
                   {appliedPromo ? finalPrice.toFixed(2) : totalPrice.toFixed(2)} ₽

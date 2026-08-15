@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { BiBasket } from 'react-icons/bi';
 import { IoAdd, IoRemove, IoHeart, IoHeartOutline } from 'react-icons/io5';
 import { useFavorites } from './FavoritesContext';
@@ -13,6 +14,7 @@ const ProductCard = ({
   packQuantity = '',
   count = 0,
   onCountChange,
+  index = 0,
 }) => {
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorite = isFavorite(name);
@@ -38,13 +40,25 @@ const ProductCard = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ 
+        duration: 0.4, 
+        delay: index * 0.05,
+        ease: "easeOut"
+      }}
+      whileHover={{ y: -5 }}
+      className="bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col relative h-full"
+    >
       {/* Фото */}
-      <div className="w-full h-48 bg-gray-100 dark:bg-gray-700 relative">
-        <img
+      <div className="w-full h-48 bg-gray-100 dark:bg-gray-700 relative overflow-hidden flex-shrink-0">
+        <motion.img
           src={image || placeholder}
           alt={name}
           className="w-full h-full object-cover"
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.3 }}
           onError={(e) => {
             if (!e.target.src.includes('data:image')) {
               e.target.src = placeholder;
@@ -55,7 +69,7 @@ const ProductCard = ({
         {/* Кнопка избранного */}
         <button
           onClick={handleToggleFavorite}
-          className="absolute top-2 left-2 w-8 h-8 bg-white/90 dark:bg-gray-700/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
+          className="absolute top-2 left-2 w-8 h-8 bg-white/90 dark:bg-gray-700/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform z-10"
         >
           {favorite ? (
             <IoHeart className="size-4 text-red-500" />
@@ -72,51 +86,53 @@ const ProductCard = ({
       </div>
 
       {/* Инфо */}
-      <div className="p-4 flex flex-col flex-1">
-        <h3 className="font-semibold text-gray-800 dark:text-white text-sm leading-tight line-clamp-2">
+      <div className="p-4 flex flex-col flex-1 pb-12">
+        <h3 className="font-semibold text-gray-800 dark:text-white text-sm leading-tight line-clamp-2 min-h-10">
           {name}
         </h3>
-        {description && (
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 line-clamp-2">{description}</p>
-        )}
 
-        {/* Цена и кнопка */}
-        <div className="mt-auto pt-3 flex flex-col gap-2">
-          <span className="text-blue-800 dark:text-blue-400 font-bold text-lg">
+        {/* Цена */}
+        <div className="mt-auto pt-2">
+          <span className="text-blue-600 dark:text-blue-400 font-bold text-lg">
             {price.toFixed(2)} ₽
             <span className="text-gray-400 dark:text-gray-500 text-xs font-normal"> /шт</span>
           </span>
-
-          {count === 0 ? (
-            <button
-              onClick={handleAddToCart}
-              className="flex items-center justify-center gap-1.5 bg-blue-800 hover:bg-blue-900 dark:bg-blue-700 dark:hover:bg-blue-800 text-white px-3 py-2 rounded-full text-sm font-medium transition-colors duration-200 w-full"
-            >
-              <BiBasket className="size-4" />
-              В корзину
-            </button>
-          ) : (
-            <div className="flex items-center justify-between bg-blue-50 dark:bg-gray-700 rounded-full px-1 py-1 w-full">
-              <button
-                onClick={handleRemove}
-                className="w-7 h-7 flex items-center justify-center bg-white dark:bg-gray-600 rounded-full border border-blue-200 dark:border-gray-500 hover:bg-blue-100 dark:hover:bg-gray-500 transition-colors"
-              >
-                <IoRemove className="size-4 text-blue-800 dark:text-blue-400" />
-              </button>
-              <span className="text-blue-800 dark:text-blue-400 font-bold text-base">
-                {count}
-              </span>
-              <button
-                onClick={handleAdd}
-                className="w-7 h-7 flex items-center justify-center bg-white dark:bg-gray-600 rounded-full border border-blue-200 dark:border-gray-500 hover:bg-blue-100 dark:hover:bg-gray-500 transition-colors"
-              >
-                <IoAdd className="size-4 text-blue-800 dark:text-blue-400" />
-              </button>
-            </div>
-          )}
         </div>
       </div>
-    </div>
+
+      {/* Круглая кнопка в правом нижнем углу */}
+      <div className="absolute bottom-3 right-3 z-10">
+        {count === 0 ? (
+          <motion.button
+            whileTap={{ scale: 0.85 }}
+            onClick={handleAddToCart}
+            className="w-9 h-9 bg-blue-600 hover:bg-blue-900 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200"
+          >
+            <IoAdd className="size-5" />
+          </motion.button>
+        ) : (
+          <div className="flex items-center gap-1.5 bg-blue-600 dark:bg-blue-700 rounded-full px-1.5 py-1 shadow-md">
+            <motion.button
+              whileTap={{ scale: 0.85 }}
+              onClick={handleRemove}
+              className="w-7 h-7 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full transition-colors"
+            >
+              <IoRemove className="size-4 text-white" />
+            </motion.button>
+            <span className="text-white font-bold text-sm min-w-5 text-center">
+              {count}
+            </span>
+            <motion.button
+              whileTap={{ scale: 0.85 }}
+              onClick={handleAdd}
+              className="w-7 h-7 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full transition-colors"
+            >
+              <IoAdd className="size-4 text-white" />
+            </motion.button>
+          </div>
+        )}
+      </div>
+    </motion.div>
   );
 };
 

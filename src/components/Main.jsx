@@ -1,9 +1,13 @@
 import ProductList from './ProductList';
 
-const Main = ({ searchQuery }) => {
+const Main = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen }) => {
   return (
     <main>
-      <ProductList searchQuery={searchQuery} />
+      <ProductList 
+        searchQuery={searchQuery} 
+        isFavoritesOpen={isFavoritesOpen}
+        setIsFavoritesOpen={setIsFavoritesOpen}
+      />
     </main>
   );
 };
