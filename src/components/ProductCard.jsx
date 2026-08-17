@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { BiBasket } from 'react-icons/bi';
 import { IoAdd, IoRemove, IoHeart, IoHeartOutline } from 'react-icons/io5';
 import { useFavorites } from './FavoritesContext';
+import useCachedImage from './useCachedImage';
 
 const placeholder =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect fill='%23e0e0e0' width='300' height='300'/%3E%3Ctext fill='%23888' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-family='Arial' font-size='18'%3EНет фото%3C/text%3E%3C/svg%3E";
@@ -9,7 +10,6 @@ const placeholder =
 const ProductCard = ({
   image,
   name = 'Без названия',
-  description = '',
   price = 0,
   packQuantity = '',
   count = 0,
@@ -18,6 +18,7 @@ const ProductCard = ({
 }) => {
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorite = isFavorite(name);
+  const cachedImage = useCachedImage(image, placeholder);
 
   const handleAdd = (e) => {
     e.stopPropagation();
@@ -54,9 +55,10 @@ const ProductCard = ({
       {/* Фото */}
       <div className="w-full h-48 bg-gray-100 dark:bg-gray-700 relative overflow-hidden flex-shrink-0">
         <motion.img
-          src={image || placeholder}
+          src={cachedImage || placeholder}
           alt={name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
+          loading="lazy"
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.3 }}
           onError={(e) => {
