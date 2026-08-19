@@ -5,8 +5,7 @@ import { IoAdd, IoRemove, IoArrowUp, IoHeart } from 'react-icons/io5';
 import SkeletonCard from './SkeletonCard';
 import FavoritesModal from './FavoritesModal';
 import { useFavorites } from './FavoritesContext';
-import ProductSlider from './ProductSlider';
-import { IoIosBasket } from "react-icons/io";
+import ProductModal from './ProductModal';
 
 const SHEET_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ39fUa7226CTie68xgiNFwda5spOyZXgijrqODL9NtFYO4R3QRmovxYuHE_JKhgPoi4cMWcI5tl8AA/pub?gid=0&single=true&output=csv';
@@ -14,7 +13,7 @@ const SHEET_URL =
 const placeholder =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect fill='%23e0e0e0' width='300' height='300'/%3E%3Ctext fill='%23888' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-family='Arial' font-size='18'%3EНет фото%3C/text%3E%3C/svg%3E";
 
-const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen  }) => {
+const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen }) => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem('cart');
@@ -94,14 +93,20 @@ const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen  }) => {
     });
   };
 
-  const updateCart = (productName, count) => {
+  const updateCart = (productName, count, unit = 'шт') => {
     setCart((prev) => {
       if (count === 0) {
         const newCart = { ...prev };
         delete newCart[productName];
         return newCart;
       }
-      return { ...prev, [productName]: count };
+      return {
+        ...prev,
+        [productName]: {
+          count,
+          unit,
+        },
+      };
     });
   };
 
@@ -110,20 +115,42 @@ const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen  }) => {
     localStorage.removeItem('cart');
   };
 
-  const totalItems = Object.values(cart).reduce((sum, c) => sum + c, 0);
-  const totalPrice = products.reduce((sum, p) => {
-    const qty = cart[p.name] || 0;
-    return sum + qty * parseFloat(p.price || 0);
+  // Подсчёт общего количества (штук)
+  const totalItems = Object.values(cart).reduce((sum, item) => {
+    return sum + item.count;
   }, 0);
 
+  // Подсчёт общей суммы
+  const totalPrice = products.reduce((sum, p) => {
+    const item = cart[p.name];
+    if (!item) return sum;
+
+    const price = parseFloat(p.price) || 0;
+    const packQuantity = parseInt(p.packQuantity) || 1;
+    const itemPrice = item.unit === 'упак' ? price * packQuantity : price;
+
+    return sum + item.count * itemPrice;
+  }, 0);
+
+  // Товары в корзине
   const cartItems = products
-    .filter((p) => cart[p.name] > 0)
-    .map((p) => ({
-      ...p,
-      price: parseFloat(p.price) || 0,
-      quantity: cart[p.name],
-      total: (parseFloat(p.price) || 0) * cart[p.name],
-    }));
+    .filter((p) => cart[p.name])
+    .map((p) => {
+      const item = cart[p.name];
+      const price = parseFloat(p.price) || 0;
+      const packQuantity = parseInt(p.packQuantity) || 1;
+      const itemPrice = item.unit === 'упак' ? price * packQuantity : price;
+
+      return {
+        ...p,
+        price: itemPrice,
+        unitPrice: price,
+        unit: item.unit,
+        packQuantity: packQuantity,
+        quantity: item.count,
+        total: itemPrice * item.count,
+      };
+    });
 
   const categories = [
     'Все',
@@ -182,17 +209,6 @@ const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen  }) => {
         </div>
       ) : (
         <>
-
-          {/* Слайдер популярных товаров
-          {searchedProducts.length > 0 && (
-            <ProductSlider
-              products={searchedProducts.slice(0, 6)}
-              title="🔥 Популярные товары"
-              cart={cart}
-              updateCart={updateCart}
-            />
-          )} */}
-
           {/* Фильтры */}
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="flex-1">
@@ -258,7 +274,7 @@ const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen  }) => {
                 <div
                   key={i}
                   onClick={() => setSelectedProduct(product)}
-                  className="cursor-pointer"
+                  className="cursor-pointer h-full"
                 >
                   <ProductCard
                     index={i}
@@ -268,8 +284,10 @@ const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen  }) => {
                     price={parseFloat(product.price) || 0}
                     packQuantity={product.packQuantity || ''}
                     category={product.category || ''}
-                    count={cart[product.name] || 0}
-                    onCountChange={(count) => updateCart(product.name, count)}
+                    count={cart[product.name]?.count || 0}
+                    onCountChange={(count, unit) =>
+                      updateCart(product.name, count, unit)
+                    }
                   />
                 </div>
               ))}
@@ -290,7 +308,7 @@ const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen  }) => {
                       <div
                         key={`${category}-${i}`}
                         onClick={() => setSelectedProduct(product)}
-                        className="cursor-pointer"
+                        className="cursor-pointer h-full"
                       >
                         <ProductCard
                           index={i}
@@ -300,9 +318,9 @@ const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen  }) => {
                           price={parseFloat(product.price) || 0}
                           packQuantity={product.packQuantity || ''}
                           category={product.category || ''}
-                          count={cart[product.name] || 0}
-                          onCountChange={(count) =>
-                            updateCart(product.name, count)
+                          count={cart[product.name]?.count || 0}
+                          onCountChange={(count, unit) =>
+                            updateCart(product.name, count, unit)
                           }
                         />
                       </div>
@@ -313,32 +331,29 @@ const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen  }) => {
             </>
           )}
 
-          {/* Кнопка "Наверх" */}
           {/* Плавающая корзина и кнопка "Наверх" */}
-<div className="fixed bottom-5 right-5 z-40 flex flex-col items-center gap-3">
-  {/* Кнопка "Наверх" */}
-  {showScrollTop && (
-    <button
-      onClick={scrollToTop}
-      className="w-10 h-10 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300"
-    >
-      <IoArrowUp className="size-5" />
-    </button>
-  )}
+          <div className="fixed bottom-5 right-5 z-40 flex flex-col items-center gap-3">
+            {showScrollTop && (
+              <button
+                onClick={scrollToTop}
+                className="w-10 h-10 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <IoArrowUp className="size-5" />
+              </button>
+            )}
 
-  {/* Корзина */}
-  <button
-    onClick={() => setIsCartOpen(true)}
-    className="relative w-14 h-14 bg-blue-600 hover:bg-blue-900 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
-  >
-    <IoIosBasket className='size-6'/>
-    {totalItems > 0 && (
-      <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
-        {totalItems}
-      </span>
-    )}
-  </button>
-</div>
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative w-14 h-14 bg-blue-600 hover:bg-blue-900 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+            >
+              🛒
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+                  {totalItems}
+                </span>
+              )}
+            </button>
+          </div>
 
           {/* Модальное окно товара */}
           {selectedProduct && (
@@ -380,101 +395,6 @@ const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen  }) => {
 };
 
 // Модальное окно товара
-const ProductModal = ({ product, onClose, cart, updateCart, placeholder }) => {
-  if (!product) return null;
-
-  const count = cart[product.name] || 0;
-
-  return (
-    <div
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full overflow-hidden shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="relative">
-          <img
-            src={product.image || placeholder}
-            alt={product.name}
-            className="w-full h-64 object-contain"
-            onError={(e) => {
-              if (!e.target.src.includes('data:image')) {
-                e.target.src = placeholder;
-              }
-            }}
-          />
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-3 w-9 h-9 bg-white/90 dark:bg-gray-700/90 rounded-full flex items-center justify-center text-gray-600 dark:text-white hover:bg-white dark:hover:bg-gray-600 transition-colors shadow-md"
-          >
-            ✕
-          </button>
-        </div>
-
-        <div className="p-5">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
-            {product.name}
-          </h2>
-          {product.category && (
-            <span className="inline-block px-2 py-1 bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400 text-xs font-semibold rounded-full mb-3">
-              {product.category}
-            </span>
-          )}
-          {product.description && (
-            <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
-              {product.description}
-            </p>
-          )}
-          {product.packQuantity && (
-            <p className="text-gray-400 dark:text-gray-500 text-sm mb-4">
-              📦 В упаковке: {product.packQuantity} шт.
-            </p>
-          )}
-
-          <div className="flex items-center justify-between">
-            <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {parseFloat(product.price).toFixed(2)} ₽
-              <span className="text-gray-400 dark:text-gray-500 text-sm font-normal">
-                {' '}
-                /шт
-              </span>
-            </span>
-
-            {count === 0 ? (
-              <button
-                onClick={() => updateCart(product.name, 1)}
-                className="bg-blue-600 hover:bg-blue-900 dark:bg-blue-700 dark:hover:bg-blue-600 text-white px-5 py-2.5 rounded-full font-medium transition-colors"
-              >
-                <IoIosBasket className='size-6'/>
-              </button>
-            ) : (
-              <div className="flex items-center gap-3 bg-blue-50 dark:bg-gray-700 rounded-full px-3 py-2">
-                <button
-                  onClick={() =>
-                    updateCart(product.name, Math.max(0, count - 1))
-                  }
-                  className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-600 rounded-full border border-blue-200 dark:border-gray-500 hover:bg-blue-100 dark:hover:bg-gray-500"
-                >
-                  <IoRemove className="size-4 text-blue-600 dark:text-blue-400" />
-                </button>
-                <span className="text-blue-600 dark:text-blue-400 font-bold text-lg">
-                  {count}
-                </span>
-                <button
-                  onClick={() => updateCart(product.name, count + 1)}
-                  className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-600 rounded-full border border-blue-200 dark:border-gray-500 hover:bg-blue-100 dark:hover:bg-gray-500"
-                >
-                  <IoAdd className="size-4 text-blue-600 dark:text-blue-400" />
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+<ProductModal />;
 
 export default ProductList;

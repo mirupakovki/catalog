@@ -1,8 +1,7 @@
 import { motion } from 'framer-motion';
-import { BiBasket } from 'react-icons/bi';
 import { IoAdd, IoRemove, IoHeart, IoHeartOutline } from 'react-icons/io5';
 import { useFavorites } from './FavoritesContext';
-import useCachedImage from './useCachedImage';
+import { useState } from 'react';
 
 const placeholder =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect fill='%23e0e0e0' width='300' height='300'/%3E%3Ctext fill='%23888' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-family='Arial' font-size='18'%3EНет фото%3C/text%3E%3C/svg%3E";
@@ -10,6 +9,7 @@ const placeholder =
 const ProductCard = ({
   image,
   name = 'Без названия',
+  description = '',
   price = 0,
   packQuantity = '',
   count = 0,
@@ -18,21 +18,32 @@ const ProductCard = ({
 }) => {
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorite = isFavorite(name);
-  const cachedImage = useCachedImage(image, placeholder);
+  
+  const [unit, setUnit] = useState('шт'); // 'шт' или 'упак'
+  
+  const packPrice = (parseFloat(price) || 0) * (parseInt(packQuantity) || 1);
+  
+  const currentPrice = unit === 'шт' ? parseFloat(price) || 0 : packPrice;
+  const currentLabel = unit === 'шт' ? 'шт' : `упак (${packQuantity} шт)`;
+
+  const formatPrice = (value) => {
+    if (value % 1 === 0) return value.toString();
+    return value.toFixed(2);
+  };
 
   const handleAdd = (e) => {
     e.stopPropagation();
-    onCountChange(count + 1);
+    onCountChange(count + 1, unit);
   };
 
   const handleRemove = (e) => {
     e.stopPropagation();
-    onCountChange(Math.max(0, count - 1));
+    onCountChange(Math.max(0, count - 1), unit);
   };
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
-    onCountChange(1);
+    onCountChange(1, unit);
   };
 
   const handleToggleFavorite = (e) => {
@@ -55,10 +66,9 @@ const ProductCard = ({
       {/* Фото */}
       <div className="w-full h-48 bg-gray-100 dark:bg-gray-700 relative overflow-hidden flex-shrink-0">
         <motion.img
-          src={cachedImage || placeholder}
+          src={image || placeholder}
           alt={name}
-          className="w-full h-full object-contain"
-          loading="lazy"
+          className="w-full h-full object-cover"
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.3 }}
           onError={(e) => {
@@ -88,48 +98,81 @@ const ProductCard = ({
       </div>
 
       {/* Инфо */}
-      <div className="p-4 flex flex-col flex-1 pb-12">
+      <div className="p-3 flex flex-col flex-1 pb-16">
         <h3 className="font-semibold text-gray-800 dark:text-white text-sm leading-tight line-clamp-2 min-h-10">
           {name}
         </h3>
 
+        {/* Переключатель: штука / упаковка */}
+        {packQuantity && parseInt(packQuantity) > 1 && (
+          <div className="mt-2 flex gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
+            <button
+              onClick={(e) => { e.stopPropagation(); setUnit('шт'); }}
+              className={`flex-1 px-2 py-1 text-xs rounded-md transition-colors ${
+                unit === 'шт' 
+                  ? 'bg-white dark:bg-gray-600 text-blue-800 dark:text-white font-semibold shadow-sm' 
+                  : 'text-gray-500 dark:text-gray-400'
+              }`}
+            >
+              Шт
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); setUnit('упак'); }}
+              className={`flex-1 px-2 py-1 text-xs rounded-md transition-colors ${
+                unit === 'упак' 
+                  ? 'bg-white dark:bg-gray-600 text-blue-800 dark:text-white font-semibold shadow-sm' 
+                  : 'text-gray-500 dark:text-gray-400'
+              }`}
+            >
+              Упак
+            </button>
+          </div>
+        )}
+
         {/* Цена */}
         <div className="mt-auto pt-2">
-          <span className="text-blue-600 dark:text-blue-400 font-bold text-lg">
-            {price.toFixed(2)} ₽
-            <span className="text-gray-400 dark:text-gray-500 text-xs font-normal"> /шт</span>
+          <span className="text-blue-800 dark:text-blue-400 font-bold text-lg">
+            {formatPrice(currentPrice)} ₽
+            <span className="text-gray-400 dark:text-gray-500 text-xs font-normal">
+              {' '}/ {unit === 'шт' ? 'шт' : 'упак'}
+            </span>
           </span>
+          {unit === 'упак' && packQuantity && (
+            <p className="text-gray-400 dark:text-gray-500 text-[10px] mt-0.5">
+              {packQuantity} шт × {formatPrice(parseFloat(price))} ₽
+            </p>
+          )}
         </div>
       </div>
 
       {/* Круглая кнопка в правом нижнем углу */}
-      <div className="absolute bottom-3 right-3 z-10">
+      <div className="absolute bottom-2 right-2 z-10">
         {count === 0 ? (
           <motion.button
             whileTap={{ scale: 0.85 }}
             onClick={handleAddToCart}
-            className="w-9 h-9 bg-blue-600 hover:bg-blue-900 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200"
+            className="w-8 h-8 bg-blue-800 hover:bg-blue-900 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200"
           >
             <IoAdd className="size-5" />
           </motion.button>
         ) : (
-          <div className="flex items-center gap-1.5 bg-blue-600 dark:bg-blue-700 rounded-full px-1.5 py-1 shadow-md">
+          <div className="flex items-center gap-0.5 bg-blue-800 dark:bg-blue-700 rounded-full px-0.5 py-0.5 shadow-md">
             <motion.button
               whileTap={{ scale: 0.85 }}
               onClick={handleRemove}
-              className="w-7 h-7 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full transition-colors"
+              className="w-6 h-6 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full transition-colors"
             >
-              <IoRemove className="size-4 text-white" />
+              <IoRemove className="size-3.5 text-white" />
             </motion.button>
-            <span className="text-white font-bold text-sm min-w-5 text-center">
+            <span className="text-white font-bold text-xs min-w-4 text-center">
               {count}
             </span>
             <motion.button
               whileTap={{ scale: 0.85 }}
               onClick={handleAdd}
-              className="w-7 h-7 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full transition-colors"
+              className="w-6 h-6 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full transition-colors"
             >
-              <IoAdd className="size-4 text-white" />
+              <IoAdd className="size-3.5 text-white" />
             </motion.button>
           </div>
         )}

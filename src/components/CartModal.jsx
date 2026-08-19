@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { IoAdd, IoRemove, IoClose } from 'react-icons/io5';
 
 const CartModal = ({
@@ -25,9 +25,14 @@ const CartModal = ({
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromo, setAppliedPromo] = useState(null);
 
+  // Для подсказок адреса
+  const [addressSuggestions, setAddressSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isLoadingAddress, setIsLoadingAddress] = useState(false);
+  const addressRef = useRef(null);
+
   const WHATSAPP_NUMBER = '79298915289';
 
-  // Промокоды
   const PROMO_CODES = {
     SALE10: 0.1,
     SALE20: 0.2,
@@ -46,6 +51,124 @@ const CartModal = ({
 
   const discountAmount = appliedPromo ? totalPrice * appliedPromo.discount : 0;
   const finalPrice = totalPrice - discountAmount;
+
+  const formatPrice = (value) => {
+    if (value % 1 === 0) return value.toString();
+    return value.toFixed(2);
+  };
+
+  // Поиск адреса через Яндекс.Карты
+  const searchAddress = async (query) => {
+  if (query.length < 3) {
+    setAddressSuggestions([]);
+    setShowSuggestions(false);
+    return;
+  }
+
+  setIsLoadingAddress(true);
+  try {
+    const response = await fetch('https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Token b5cbe250d413b5d6d70a91b42063d6f765b2ea08`, // <-- Вставь свой ключ
+      },
+      body: JSON.stringify({
+        query: query,
+        count: 10,
+        locations: [
+          {
+            country: 'Россия',
+          }
+        ],
+      }),
+    });
+
+    const data = await response.json();
+    
+    if (data && data.suggestions && data.suggestions.length > 0) {
+      const suggestions = data.suggestions.map(item => {
+        const d = item.data;
+        
+        // Собираем понятный адрес
+        const parts = [];
+        
+        if (d.city) parts.push(`г. ${d.city}`);
+        else if (d.settlement) parts.push(d.settlement);
+        else if (d.city_district) parts.push(d.city_district);
+        
+        if (d.street) parts.push(`ул. ${d.street}`);
+        if (d.house) parts.push(`д. ${d.house}`);
+        if (d.block) parts.push(`корп. ${d.block}`);
+        
+        const shortAddress = parts.join(', ');
+        
+        return {
+          value: shortAddress || item.value,
+          fullAddress: item.value,
+          data: {
+            city: d.city || d.settlement || '',
+            street: d.street || '',
+            house: d.house || '',
+            region: d.region_with_type || '',
+          }
+        };
+      });
+      
+      setAddressSuggestions(suggestions);
+      setShowSuggestions(true);
+    } else {
+      setAddressSuggestions([]);
+      setShowSuggestions(false);
+    }
+  } catch (error) {
+    console.error('Ошибка поиска адреса:', error);
+    setAddressSuggestions([]);
+    setShowSuggestions(false);
+  } finally {
+    setIsLoadingAddress(false);
+  }
+};
+
+  // Обработчик ввода адреса с дебаунсом
+  const handleAddressChange = (e) => {
+    const value = e.target.value;
+    const newFormData = {
+      ...formData,
+      address: value,
+    };
+    setFormData(newFormData);
+    localStorage.setItem('checkoutForm', JSON.stringify(newFormData));
+
+    clearTimeout(window.addressTimeout);
+    window.addressTimeout = setTimeout(() => {
+      searchAddress(value);
+    }, 300);
+  };
+
+  // Выбор адреса из подсказок
+  const selectAddress = (suggestion) => {
+    const newFormData = {
+      ...formData,
+      address: suggestion.value,
+    };
+    setFormData(newFormData);
+    localStorage.setItem('checkoutForm', JSON.stringify(newFormData));
+    setAddressSuggestions([]);
+    setShowSuggestions(false);
+  };
+
+  // Закрыть подсказки при клике вне
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (addressRef.current && !addressRef.current.contains(e.target)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   const handleInputChange = (e) => {
     const newFormData = {
@@ -71,12 +194,15 @@ ${formData.comment ? `💬 *Комментарий:* ${formData.comment}` : ''}
 ${appliedPromo ? `🎟️ *Промокод:* ${appliedPromo.code} (-${appliedPromo.discount * 100}%)` : ''}
 
 📦 *Товары:*
-${cartItems.map((item, i) => (
-  `${i + 1}. ${item.name}
-   ${item.quantity} шт. × ${item.price.toFixed(2)} ₽ = ${item.total.toFixed(2)} ₽`
-)).join('\n')}
+${cartItems
+  .map((item, i) => {
+    const unitLabel = item.unit === 'упак' ? 'уп' : 'шт';
+    return `${i + 1}. ${item.name}
+   ${item.quantity} ${unitLabel} × ${formatPrice(item.price)} ₽ = ${formatPrice(item.total)} ₽`;
+  })
+  .join('\n')}
 
-💰 *Итого:* ${finalTotal.toFixed(2)} ₽
+💰 *Итого:* ${formatPrice(finalTotal)} ₽
 `;
 
     const encodedText = encodeURIComponent(orderText);
@@ -170,13 +296,19 @@ ${cartItems.map((item, i) => (
                           {item.name}
                         </p>
                         <p className="text-xs text-gray-400 dark:text-gray-500">
-                          {item.price.toFixed(2)} ₽/шт
+                          {formatPrice(item.price)} ₽/
+                          {item.unit === 'упак' ? 'уп' : 'шт'}
                         </p>
+                        {item.unit === 'упак' && (
+                          <p className="text-[10px] text-gray-400 dark:text-gray-500">
+                            {item.packQuantity} шт в упаковке
+                          </p>
+                        )}
                       </div>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() =>
-                            updateCart(item.name, item.quantity - 1)
+                            updateCart(item.name, item.quantity - 1, item.unit)
                           }
                           className="w-7 h-7 flex items-center justify-center bg-white dark:bg-gray-600 rounded-full border border-gray-200 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-500"
                         >
@@ -187,7 +319,7 @@ ${cartItems.map((item, i) => (
                         </span>
                         <button
                           onClick={() =>
-                            updateCart(item.name, item.quantity + 1)
+                            updateCart(item.name, item.quantity + 1, item.unit)
                           }
                           className="w-7 h-7 flex items-center justify-center bg-white dark:bg-gray-600 rounded-full border border-gray-200 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-500"
                         >
@@ -195,7 +327,7 @@ ${cartItems.map((item, i) => (
                         </button>
                       </div>
                       <div className="text-sm font-bold text-blue-600 dark:text-blue-400 w-20 text-right">
-                        {item.total.toFixed(2)} ₽
+                        {formatPrice(item.total)} ₽
                       </div>
                     </div>
                   ))}
@@ -206,7 +338,6 @@ ${cartItems.map((item, i) => (
             {/* Промокод и итог */}
             {cartItems.length > 0 && (
               <div className="p-5 border-t border-gray-100 dark:border-gray-700">
-                {/* Промокод */}
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-3 mb-3">
                   <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                     🎟️ Промокод
@@ -246,7 +377,6 @@ ${cartItems.map((item, i) => (
                   )}
                 </div>
 
-                {/* Итог с учётом скидки */}
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-gray-500 dark:text-gray-400">
                     Итого:
@@ -254,15 +384,15 @@ ${cartItems.map((item, i) => (
                   {appliedPromo ? (
                     <div className="text-right">
                       <span className="text-sm text-gray-400 line-through mr-2">
-                        {totalPrice.toFixed(2)} ₽
+                        {formatPrice(totalPrice)} ₽
                       </span>
                       <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                        {finalPrice.toFixed(2)} ₽
+                        {formatPrice(finalPrice)} ₽
                       </span>
                     </div>
                   ) : (
                     <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                      {totalPrice.toFixed(2)} ₽
+                      {formatPrice(totalPrice)} ₽
                     </span>
                   )}
                 </div>
@@ -277,7 +407,6 @@ ${cartItems.map((item, i) => (
             )}
           </>
         ) : (
-          /* Форма оформления */
           <form
             onSubmit={handleSubmit}
             className="flex-1 overflow-y-auto p-5 space-y-4"
@@ -320,7 +449,9 @@ ${cartItems.map((item, i) => (
                 placeholder="+7 (900) 000-00-00"
               />
             </div>
-            <div>
+
+            {/* Адрес с подсказками */}
+            <div ref={addressRef} className="relative">
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                 Адрес доставки
               </label>
@@ -328,11 +459,42 @@ ${cartItems.map((item, i) => (
                 type="text"
                 name="address"
                 value={formData.address}
-                onChange={handleInputChange}
+                onChange={handleAddressChange}
+                onFocus={() => formData.address && setShowSuggestions(true)}
                 className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-700 dark:text-white"
-                placeholder="Город, улица, дом"
+                placeholder="Начните вводить адрес..."
+                autoComplete="off"
               />
+
+              {isLoadingAddress && (
+                <div className="absolute right-3 top-10">
+                  <div className="animate-spin w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+                </div>
+              )}
+
+              {showSuggestions && addressSuggestions.length > 0 && (
+  <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg overflow-hidden max-h-60 overflow-y-auto">
+    {addressSuggestions.map((suggestion, i) => (
+      <button
+        key={i}
+        type="button"
+        onClick={() => selectAddress(suggestion)}
+        className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+      >
+        <p className="text-sm text-gray-800 dark:text-white">
+          {suggestion.value}
+        </p>
+        {suggestion.data.region && (
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+            {suggestion.data.region}
+          </p>
+        )}
+      </button>
+    ))}
+  </div>
+)}
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                 Комментарий
@@ -347,7 +509,6 @@ ${cartItems.map((item, i) => (
               />
             </div>
 
-            {/* Сумма заказа */}
             <div className="bg-blue-50 dark:bg-gray-700 rounded-xl p-4">
               <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
                 <span>Товаров:</span>
@@ -356,13 +517,16 @@ ${cartItems.map((item, i) => (
               {appliedPromo && (
                 <div className="flex justify-between text-sm text-green-600 mb-1">
                   <span>Скидка ({appliedPromo.code}):</span>
-                  <span>-{discountAmount.toFixed(2)} ₽</span>
+                  <span>-{formatPrice(discountAmount)} ₽</span>
                 </div>
               )}
               <div className="flex justify-between text-lg font-bold text-blue-600 dark:text-blue-400">
                 <span>Итого:</span>
                 <span>
-                  {appliedPromo ? finalPrice.toFixed(2) : totalPrice.toFixed(2)} ₽
+                  {appliedPromo
+                    ? formatPrice(finalPrice)
+                    : formatPrice(totalPrice)}{' '}
+                  ₽
                 </span>
               </div>
             </div>
