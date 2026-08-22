@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Main from '../components/Main';
-import DownloadCatalog from '../components/DownloadCatalog'; // <-- Импорт
+import DownloadCatalog from '../components/DownloadCatalog';
 import Banner from '../components/Banner';
 
 const SHEET_URL =

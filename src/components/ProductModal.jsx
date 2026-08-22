@@ -32,7 +32,7 @@ const ProductModal = ({ product, onClose, cart, updateCart, placeholder }) => {
           <img
             src={product.image || placeholder}
             alt={product.name}
-            className="w-full h-64 object-cover"
+            className="w-full h-64 object-contain"
             onError={(e) => {
               if (!e.target.src.includes('data:image')) {
                 e.target.src = placeholder;

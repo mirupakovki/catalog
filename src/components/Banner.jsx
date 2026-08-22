@@ -5,31 +5,23 @@ import { IoChevronBack, IoChevronForward, IoClose } from 'react-icons/io5';
 const Banner = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentCase, setCurrentCase] = useState(0);
-
+  
   const cases = [
     {
       id: 1,
-      title: '🏭 Кафе "Вкусный дом"',
-      problem: 'Нужна была упаковка для доставки еды',
-      solution: 'Подобрали контейнеры и пакеты с логотипом',
-      result: 'Клиент увеличил заказы на 30%',
-      image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&fit=crop',
+      title: '🌙 Рамадан стаканы',
+      problem: 'Нужна была серия стаканов к празднику Рамадан',
+      solution: 'Создали дизайн с исламскими узорами и символикой',
+      result: 'Вся партия раскуплена за неделю до праздника',
+      image: 'https://s3.twcstorage.ru/catalog/custom/01e55dba-577e-4359-9fc0-9db82cf29a59.JPG',
     },
     {
       id: 2,
-      title: '🛍️ Магазин подарков',
-      problem: 'Нужна была праздничная упаковка',
-      solution: 'Предложили наборы подарочных пакетов',
-      result: 'Продажи в праздники выросли в 2 раза',
-      image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&h=300&fit=crop',
-    },
-    {
-      id: 3,
-      title: '📦 Интернет-магазин',
-      problem: 'Дорогая упаковка для отправки',
-      solution: 'Оптимизировали размеры и материалы',
-      result: 'Экономия 15% на упаковке',
-      image: 'https://images.unsplash.com/photo-1553413077-190dd305871c?w=400&h=300&fit=crop',
+      title: '🥩 Пакет для мясной продукции',
+      problem: 'Нужна была упаковка для мясных изделий под заказ',
+      solution: 'Изготовили пакеты "майка" с логотипом мясного магазина',
+      result: 'Покупатели узнают бренд на улице — выросла узнаваемость',
+      image: 'https://s3.twcstorage.ru/catalog/custom/%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%20%D0%BC%D0%B0%D0%B8%CC%86%D0%BA%D0%B0%20%D0%B7%D0%B0%D0%BA%D0%B0%D0%B7%D0%BD%D0%B0%D1%8F.jpg',
     },
   ];
 
@@ -47,12 +39,12 @@ const Banner = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="mx-3 mb-6 rounded-2xl overflow-hidden bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg"
+        className="mx-3 my-6 rounded-2xl overflow-hidden bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg"
       >
         <div className="flex items-center justify-between px-6 py-5">
           <div>
             <h3 className="text-lg font-bold mb-1">📦 Нужна упаковка под заказ?</h3>
-            <p className="text-blue-100 text-sm">Изготовим упаковку любого размера с вашим логотипом</p>
+            <p className="text-blue-100 text-sm">Стаканы, пакеты майка — изготовим с вашим логотипом</p>
           </div>
           <button
             onClick={() => setIsOpen(true)}
@@ -104,7 +96,7 @@ const Banner = () => {
                     <img
                       src={cases[currentCase].image}
                       alt={cases[currentCase].title}
-                      className="w-full h-48 object-cover rounded-xl mb-4"
+                      className="w-full h-48 object-contain rounded-xl mb-4"
                       onError={(e) => {
                         e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23ddd' width='400' height='300'/%3E%3Ctext fill='%23999' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='20'%3EКейс%3C/text%3E%3C/svg%3E";
                       }}
@@ -129,13 +121,13 @@ const Banner = () => {
                 {/* Кнопки навигации */}
                 <button
                   onClick={prevCase}
-                  className="absolute left-5 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center shadow-md hover:bg-white transition-colors"
+                  className="absolute left-5 top-1/3 -translate-y-1/2 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center shadow-md hover:bg-white transition-colors"
                 >
                   <IoChevronBack className="size-5" />
                 </button>
                 <button
                   onClick={nextCase}
-                  className="absolute right-5 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center shadow-md hover:bg-white transition-colors"
+                  className="absolute right-5 top-1/3 -translate-y-1/2 w-9 h-9 bg-white/90 rounded-full flex items-center justify-center shadow-md hover:bg-white transition-colors"
                 >
                   <IoChevronForward className="size-5" />
                 </button>
@@ -159,7 +151,7 @@ const Banner = () => {
               {/* CTA */}
               <div className="p-5 border-t border-gray-100 dark:border-gray-700">
                 <a
-                  href="https://wa.me/79298915289?text=Здравствуйте! Хочу заказать упаковку под заказ"
+                  href="https://wa.me/79272326579?text=Здравствуйте! Хочу заказать упаковку под заказ"
                   target="_blank"
                   className="block w-full bg-green-600 hover:bg-green-700 text-white text-center py-3 rounded-xl font-semibold transition-colors"
                 >

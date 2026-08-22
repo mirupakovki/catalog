@@ -36,7 +36,7 @@ const Header = ({
             {/* Кнопка избранного */}
             <button
               onClick={onOpenFavorites}
-              className="relative w-12 h-12 flex-shrink-0 flex justify-center items-center bg-gray-200 dark:bg-gray-700 rounded-xl cursor-pointer transition-all hover:scale-110"
+              className="relative w-12 h-12 flex-shrink-0 flex justify-center items-center bg-gray-100 dark:bg-gray-700 rounded-xl cursor-pointer transition-all hover:scale-110"
             >
               <IoHeart className="size-6 text-red-500" />
               {favorites.length > 0 && (
@@ -49,7 +49,7 @@ const Header = ({
             {/* Переключатель темы */}
             <button
               onClick={toggleTheme}
-              className="w-12 h-12 flex-shrink-0 flex justify-center items-center bg-gray-200 dark:bg-gray-700 rounded-xl cursor-pointer transition-all hover:scale-110"
+              className="w-12 h-12 flex-shrink-0 flex justify-center items-center bg-gray-100 dark:bg-gray-700 rounded-xl cursor-pointer transition-all hover:scale-110"
             >
               {isDark ? (
                 <IoSunny className="size-6 text-yellow-400" />

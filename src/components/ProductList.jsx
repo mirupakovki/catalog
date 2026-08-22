@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
 import CartModal from './CartModal';
-import { IoAdd, IoRemove, IoArrowUp, IoHeart } from 'react-icons/io5';
+import { IoArrowUp } from 'react-icons/io5';
 import SkeletonCard from './SkeletonCard';
 import FavoritesModal from './FavoritesModal';
 import { useFavorites } from './FavoritesContext';
 import ProductModal from './ProductModal';
+import { GiBasket } from "react-icons/gi";
 
 const SHEET_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ39fUa7226CTie68xgiNFwda5spOyZXgijrqODL9NtFYO4R3QRmovxYuHE_JKhgPoi4cMWcI5tl8AA/pub?gid=0&single=true&output=csv';
@@ -348,7 +349,7 @@ const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen }) => {
               onClick={() => setIsCartOpen(true)}
               className="relative w-14 h-14 bg-blue-600 hover:bg-blue-900 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
             >
-              🛒
+              <GiBasket  className='size-6'/>
               {totalItems > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
                   {totalItems}

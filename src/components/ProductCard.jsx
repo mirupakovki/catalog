@@ -68,7 +68,7 @@ const ProductCard = ({
         <motion.img
           src={image || placeholder}
           alt={name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.3 }}
           onError={(e) => {
@@ -110,7 +110,7 @@ const ProductCard = ({
               onClick={(e) => { e.stopPropagation(); setUnit('шт'); }}
               className={`flex-1 px-2 py-1 text-xs rounded-md transition-colors ${
                 unit === 'шт' 
-                  ? 'bg-white dark:bg-gray-600 text-blue-800 dark:text-white font-semibold shadow-sm' 
+                  ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-white font-semibold shadow-sm' 
                   : 'text-gray-500 dark:text-gray-400'
               }`}
             >
@@ -120,7 +120,7 @@ const ProductCard = ({
               onClick={(e) => { e.stopPropagation(); setUnit('упак'); }}
               className={`flex-1 px-2 py-1 text-xs rounded-md transition-colors ${
                 unit === 'упак' 
-                  ? 'bg-white dark:bg-gray-600 text-blue-800 dark:text-white font-semibold shadow-sm' 
+                  ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-white font-semibold shadow-sm' 
                   : 'text-gray-500 dark:text-gray-400'
               }`}
             >
@@ -131,7 +131,7 @@ const ProductCard = ({
 
         {/* Цена */}
         <div className="mt-auto pt-2">
-          <span className="text-blue-800 dark:text-blue-400 font-bold text-lg">
+          <span className="text-blue-600 dark:text-blue-400 font-bold text-lg">
             {formatPrice(currentPrice)} ₽
             <span className="text-gray-400 dark:text-gray-500 text-xs font-normal">
               {' '}/ {unit === 'шт' ? 'шт' : 'упак'}
@@ -151,18 +151,18 @@ const ProductCard = ({
           <motion.button
             whileTap={{ scale: 0.85 }}
             onClick={handleAddToCart}
-            className="w-8 h-8 bg-blue-800 hover:bg-blue-900 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200"
+            className="w-10 h-10 bg-blue-600 hover:bg-blue-900 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200"
           >
             <IoAdd className="size-5" />
           </motion.button>
         ) : (
-          <div className="flex items-center gap-0.5 bg-blue-800 dark:bg-blue-700 rounded-full px-0.5 py-0.5 shadow-md">
+          <div className="w-28 flex justify-between items-center gap-0.5 bg-blue-600 dark:bg-blue-700 rounded-full px-1 py-1 shadow-md">
             <motion.button
               whileTap={{ scale: 0.85 }}
               onClick={handleRemove}
-              className="w-6 h-6 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full transition-colors"
+              className="w-8 h-8 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full transition-colors"
             >
-              <IoRemove className="size-3.5 text-white" />
+              <IoRemove className="size-4 text-white" />
             </motion.button>
             <span className="text-white font-bold text-xs min-w-4 text-center">
               {count}
@@ -170,9 +170,9 @@ const ProductCard = ({
             <motion.button
               whileTap={{ scale: 0.85 }}
               onClick={handleAdd}
-              className="w-6 h-6 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full transition-colors"
+              className="w-8 h-8 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full transition-colors"
             >
-              <IoAdd className="size-3.5 text-white" />
+              <IoAdd className="size-4 text-white" />
             </motion.button>
           </div>
         )}

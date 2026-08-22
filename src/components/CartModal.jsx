@@ -285,7 +285,7 @@ ${cartItems
                       <img
                         src={item.image}
                         alt={item.name}
-                        className="w-16 h-16 object-cover rounded-lg"
+                        className="w-16 h-16 object-contain rounded-lg"
                         onError={(e) => {
                           e.target.src =
                             "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect fill='%23ddd' width='64' height='64'/%3E%3C/svg%3E";
@@ -305,7 +305,10 @@ ${cartItems
                           </p>
                         )}
                       </div>
-                      <div className="flex items-center gap-2">
+                      
+                      <div className="flex flex-col justify-between text-sm font-bold text-blue-600 dark:text-blue-400 w-20 h-14 text-right">
+                        {formatPrice(item.total)} ₽
+                        <div className="flex items-center justify-between">
                         <button
                           onClick={() =>
                             updateCart(item.name, item.quantity - 1, item.unit)
@@ -326,8 +329,6 @@ ${cartItems
                           <IoAdd className="size-3 text-gray-600 dark:text-white" />
                         </button>
                       </div>
-                      <div className="text-sm font-bold text-blue-600 dark:text-blue-400 w-20 text-right">
-                        {formatPrice(item.total)} ₽
                       </div>
                     </div>
                   ))}
