@@ -4,7 +4,14 @@ import { useTheme } from './ThemeContext';
 import { useFavorites } from './FavoritesContext';
 import { IoMoon, IoSunny, IoHeart } from 'react-icons/io5';
 
-const Header = ({ searchQuery, setSearchQuery, isActiveSearch, setIsActiveSearch, onOpenFavorites }) => {
+
+const Header = ({ 
+  searchQuery, 
+  setSearchQuery, 
+  isActiveSearch, 
+  setIsActiveSearch, 
+  onOpenFavorites,
+}) => {
   const { isDark, toggleTheme } = useTheme();
   const { favorites } = useFavorites();
 
@@ -26,6 +33,7 @@ const Header = ({ searchQuery, setSearchQuery, isActiveSearch, setIsActiveSearch
         
         {!isActiveSearch && (
           <>
+            {/* Кнопка избранного */}
             <button
               onClick={onOpenFavorites}
               className="relative w-12 h-12 flex-shrink-0 flex justify-center items-center bg-gray-200 dark:bg-gray-700 rounded-xl cursor-pointer transition-all hover:scale-110"
@@ -38,6 +46,7 @@ const Header = ({ searchQuery, setSearchQuery, isActiveSearch, setIsActiveSearch
               )}
             </button>
 
+            {/* Переключатель темы */}
             <button
               onClick={toggleTheme}
               className="w-12 h-12 flex-shrink-0 flex justify-center items-center bg-gray-200 dark:bg-gray-700 rounded-xl cursor-pointer transition-all hover:scale-110"
@@ -51,6 +60,7 @@ const Header = ({ searchQuery, setSearchQuery, isActiveSearch, setIsActiveSearch
           </>
         )}
       </div>
+      
     </header>
   );
 };

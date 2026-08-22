@@ -53,9 +53,9 @@ const CartModal = ({
   const finalPrice = totalPrice - discountAmount;
 
   const formatPrice = (value) => {
-    if (value % 1 === 0) return value.toString();
-    return value.toFixed(2);
-  };
+  if (value === 0) return '0';
+  return value.toFixed(2).replace(/\.?0+$/, '');
+};
 
   // Поиск адреса через Яндекс.Карты
   const searchAddress = async (query) => {

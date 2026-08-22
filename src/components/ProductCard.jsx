@@ -27,9 +27,9 @@ const ProductCard = ({
   const currentLabel = unit === 'шт' ? 'шт' : `упак (${packQuantity} шт)`;
 
   const formatPrice = (value) => {
-    if (value % 1 === 0) return value.toString();
-    return value.toFixed(2);
-  };
+  if (value === 0) return '0';
+  return value.toFixed(2).replace(/\.?0+$/, '');
+};
 
   const handleAdd = (e) => {
     e.stopPropagation();

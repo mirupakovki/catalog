@@ -15,9 +15,9 @@ const ProductModal = ({ product, onClose, cart, updateCart, placeholder }) => {
   const currentPrice = unit === 'шт' ? price : packPrice;
 
   const formatPrice = (value) => {
-    if (value % 1 === 0) return value.toString();
-    return value.toFixed(2);
-  };
+  if (value === 0) return '0';
+  return value.toFixed(2).replace(/\.?0+$/, '');
+};
 
   return (
     <div

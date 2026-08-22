@@ -62,7 +62,12 @@ const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen }) => {
           const values = parseCSV(line);
           const obj = {};
           headers.forEach((header, i) => {
-            obj[header] = values[i] || '';
+            let value = values[i] || '';
+            // Исправляем запятую на точку для цены
+            if (header === 'price') {
+              value = value.replace(',', '.');
+            }
+            obj[header] = value;
           });
           return obj;
         });
@@ -115,12 +120,10 @@ const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen }) => {
     localStorage.removeItem('cart');
   };
 
-  // Подсчёт общего количества (штук)
   const totalItems = Object.values(cart).reduce((sum, item) => {
     return sum + item.count;
   }, 0);
 
-  // Подсчёт общей суммы
   const totalPrice = products.reduce((sum, p) => {
     const item = cart[p.name];
     if (!item) return sum;
@@ -132,7 +135,6 @@ const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen }) => {
     return sum + item.count * itemPrice;
   }, 0);
 
-  // Товары в корзине
   const cartItems = products
     .filter((p) => cart[p.name])
     .map((p) => {
@@ -393,8 +395,5 @@ const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen }) => {
     </div>
   );
 };
-
-// Модальное окно товара
-<ProductModal />;
 
 export default ProductList;
