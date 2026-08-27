@@ -3,6 +3,8 @@ import Header from '../components/Header';
 import Main from '../components/Main';
 import DownloadCatalog from '../components/DownloadCatalog';
 import Banner from '../components/Banner';
+import StoreSwitcher from '../components/StoreSwitcher';
+import StoreSelectionModal from '../components/StoreSelectionModal';
 
 const SHEET_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ39fUa7226CTie68xgiNFwda5spOyZXgijrqODL9NtFYO4R3QRmovxYuHE_JKhgPoi4cMWcI5tl8AA/pub?gid=0&single=true&output=csv';
@@ -55,6 +57,7 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 pt-5">
+      <StoreSelectionModal />
       <Header
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -64,7 +67,10 @@ const HomePage = () => {
         products={products} // <-- Передай продукты
       />
       {/* Кнопка скачивания PDF */}
-      <DownloadCatalog products={products} />
+      <div className='flex justify-between'>
+        <DownloadCatalog products={products} />
+        <StoreSwitcher />
+      </div>
       <Banner /> {/* <-- Добавь здесь */}
       <Main
         searchQuery={searchQuery}

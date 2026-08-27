@@ -1,14 +1,18 @@
 import { ThemeProvider } from './components/ThemeContext';
 import { FavoritesProvider } from './components/FavoritesContext';
-import HomePage from './pages/HomePage'; 
+import { StoreProvider } from './components/StoreContext';
+import HomePage from './pages/HomePage';
 
 function App() {
   return (
     <ThemeProvider>
       <FavoritesProvider>
-        <HomePage />
+        <StoreProvider>
+          <HomePage />
+        </StoreProvider>
       </FavoritesProvider>
     </ThemeProvider>
   );
 }
+
 export default App;

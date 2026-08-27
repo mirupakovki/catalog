@@ -7,6 +7,7 @@ import FavoritesModal from './FavoritesModal';
 import { useFavorites } from './FavoritesContext';
 import ProductModal from './ProductModal';
 import { GiBasket } from "react-icons/gi";
+import { useStore } from './StoreContext';
 
 const SHEET_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ39fUa7226CTie68xgiNFwda5spOyZXgijrqODL9NtFYO4R3QRmovxYuHE_JKhgPoi4cMWcI5tl8AA/pub?gid=0&single=true&output=csv';
@@ -27,6 +28,7 @@ const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen }) => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { favorites } = useFavorites();
+  const { storeType } = useStore();
 
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cart));
@@ -179,6 +181,7 @@ const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen }) => {
     }
   };
 
+
   const filteredProducts =
     activeCategory === 'Все'
       ? sortProducts(products)
@@ -188,7 +191,25 @@ const ProductList = ({ searchQuery, isFavoritesOpen, setIsFavoritesOpen }) => {
           ),
         );
 
-  const searchedProducts = filteredProducts.filter(
+  // ✅ ФИЛЬТР ПО ТИПУ МАГАЗИНА — добавь сюда
+  const storeTypeMap = {
+  'SUPERMARKET': 'супермаркет',
+  'HOME_STORE': 'хозмаг',
+  'RESTAURANT': 'ресторан',
+};
+
+const storeFilteredProducts = storeType === 'ALL'
+  ? filteredProducts
+  : filteredProducts.filter(p => {
+      const tags = (p.tags || '').toLowerCase().split(',').map(t => t.trim());
+      const searchTag = storeTypeMap[storeType] || '';
+      
+      return tags.includes(searchTag) || 
+             tags.includes('все') ||
+             tags.includes('all');
+    });
+
+  const searchedProducts = storeFilteredProducts.filter(
     (p) =>
       (p.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (p.description || '').toLowerCase().includes(searchQuery.toLowerCase()) ||

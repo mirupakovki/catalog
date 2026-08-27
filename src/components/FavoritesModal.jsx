@@ -44,18 +44,24 @@ const FavoritesModal = ({ favorites, products, cart, onClose, updateCart }) => {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {favoriteProducts.map((product, i) => (
-                <ProductCard
-                  key={i}
-                  image={product.image}
-                  name={product.name}
-                  description={product.description}
-                  price={parseFloat(product.price) || 0}
-                  packQuantity={product.packQuantity}
-                  count={cart[product.name] || 0}
-                  onCountChange={(count) => updateCart(product.name, count)}
-                />
-              ))}
+              {favoriteProducts.map((product, i) => {
+                // ✅ Исправление: получаем count из объекта
+                const cartItem = cart[product.name];
+                const count = cartItem?.count || 0;
+
+                return (
+                  <ProductCard
+                    key={i}
+                    image={product.image}
+                    name={product.name}
+                    description={product.description}
+                    price={parseFloat(product.price) || 0}
+                    packQuantity={product.packQuantity}
+                    count={count}
+                    onCountChange={(count, unit) => updateCart(product.name, count, unit)}
+                  />
+                );
+              })}
             </div>
           )}
         </div>
